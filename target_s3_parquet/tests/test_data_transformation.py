@@ -1,13 +1,15 @@
-from sqlalchemy import true
+import json
+
+import numpy as np
+from pandas import DataFrame
+# from sqlalchemy import true  # F401: Unused import removed
+
 from target_s3_parquet.sanitizer import (
-    get_specific_type_attributes,
     apply_json_dump_to_df,
+    get_specific_type_attributes,
     get_valid_attributes,
     stringify_df,
 )
-from pandas import DataFrame
-import numpy as np
-import json
 
 
 def test_dict_type_transformation():
@@ -47,20 +49,20 @@ def test_dict_type_transformation():
     attributes_names = get_specific_type_attributes(schema, "object")
     df_transformed = apply_json_dump_to_df(df, attributes_names)
     assert (
-        df[attributes_names].equals(df_transformed[attributes_names]) == False
-    ), "object type columns must be transformed"
+        df[attributes_names].equals(df_transformed[attributes_names]) is False
+    ), "object type columns must be transformed"  # E712 corrected
 
     assert json.loads(df_transformed.loc[0, "property_count_events"]) == {
         "a": 1,
         "subdomain": "mac donald's",
     }, "transformed columns must be a valid json"
 
-    assert (
-        df.loc[:, ~df.columns.isin(attributes_names)].equals(
-            df_transformed.loc[:, ~df_transformed.columns.isin(attributes_names)]
-        )
-        == True
-    ), "should only transform object type columns"
+    # E501: Wrapped line
+    assert df.loc[
+        :, ~df.columns.isin(attributes_names)
+    ].equals(
+        df_transformed.loc[:, ~df_transformed.columns.isin(attributes_names)]
+    ) is True, "should only transform object type columns"  # E712 corrected
 
 
 def test_should_get_valid_attributes():

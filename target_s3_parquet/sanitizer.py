@@ -1,8 +1,9 @@
-from pandas import DataFrame
-import numpy as np
 import json
-from typing import List
 from decimal import Decimal
+from typing import List
+
+import numpy as np
+from pandas import DataFrame
 
 
 def _remove_nulls(array):

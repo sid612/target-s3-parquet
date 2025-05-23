@@ -1,9 +1,10 @@
-from target_s3_parquet.data_type_generator import (
-    generate_tap_schema,
-    generate_current_target_schema,
-)
 import pytest
 from pandas import DataFrame
+
+from target_s3_parquet.data_type_generator import (
+    generate_current_target_schema,
+    generate_tap_schema,
+)
 
 
 def test_invalid_schema():

@@ -1,24 +1,24 @@
 """S3Parquet target sink class, which handles writing streams."""
 
 
+from datetime import datetime
 from typing import Dict, List, Optional
+
 import awswrangler as wr
 from pandas import DataFrame
 from singer_sdk import Target
 from singer_sdk.sinks import BatchSink
-import json
+
+# import json # Unused import removed
 from target_s3_parquet.data_type_generator import (
-    generate_tap_schema,
     generate_current_target_schema,
+    generate_tap_schema,
 )
 from target_s3_parquet.sanitizer import (
-    get_specific_type_attributes,
     apply_json_dump_to_df,
+    get_specific_type_attributes,
     stringify_df,
 )
-
-
-from datetime import datetime
 
 STARTED_AT = datetime.now()
 
@@ -64,7 +64,8 @@ class S3ParquetSink(BatchSink):
 
         current_schema = generate_current_target_schema(self._get_glue_schema())
         tap_schema = generate_tap_schema(
-            self.schema["properties"], only_string=self.config.get("stringify_schema")
+            self.schema["properties"],
+            only_string=self.config.get("stringify_schema"),
         )
 
         dtype = {**current_schema, **tap_schema}
@@ -78,7 +79,10 @@ class S3ParquetSink(BatchSink):
 
         self.logger.debug(f"DType Definition: {dtype}")
 
-        full_path = f"{self.config.get('s3_path')}/{self.config.get('athena_database')}/{self.stream_name}"
+        s3_path = self.config.get("s3_path")
+        athena_database = self.config.get("athena_database")
+        stream_name = self.stream_name
+        full_path = f"{s3_path}/{athena_database}/{stream_name}"
 
         wr.s3.to_parquet(
             df=df,
